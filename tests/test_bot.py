@@ -1,6 +1,6 @@
 import mock
 import unittest
-from src.bot import Bot
+from nambaone.bot import Bot
 from unittest.mock import MagicMock
 
 
@@ -17,7 +17,7 @@ class TestBot(unittest.TestCase):
 
         self.assertEqual(self.bot.header, expected_headers)
 
-    @mock.patch('src.bot.requests.post')
+    @mock.patch('nambaone.bot.requests.post')
     def test_send_message(self, requests_post_mock):
         chat_id = 1
         content = 'test_content'
@@ -48,7 +48,7 @@ class TestBot(unittest.TestCase):
 
         self.assertEqual(message.id, 1000)
 
-    @mock.patch('src.bot.requests.post')
+    @mock.patch('nambaone.bot.requests.post')
     def test_create_chat(self, requests_post_mock):
         user_id = 1
         name = 'test_chat_name'
@@ -79,7 +79,7 @@ class TestBot(unittest.TestCase):
 
         self.assertEqual(chat.id, 1000)
 
-    @mock.patch('src.bot.requests.get')
+    @mock.patch('nambaone.bot.requests.get')
     def test_typing_start(self, requests_get_mock):
         self.bot.typing_start(1000)
 
@@ -88,7 +88,7 @@ class TestBot(unittest.TestCase):
             headers=mock.ANY
         )
 
-    @mock.patch('src.bot.requests.get')
+    @mock.patch('nambaone.bot.requests.get')
     def test_typing_stop(self, requests_get_mock):
         self.bot.typing_stop(1000)
 

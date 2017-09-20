@@ -1,5 +1,5 @@
 import unittest
-from src.chat import Chat
+from nambaone.chat import Chat
 
 
 class TestChat(unittest.TestCase):

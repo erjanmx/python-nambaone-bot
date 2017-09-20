@@ -1,10 +1,10 @@
 import mock
 import unittest
-from src.bot import Bot
-from src.user import User
-from src.update import Update
+from nambaone.bot import Bot
+from nambaone.user import User
+from nambaone.update import Update
 from unittest.mock import MagicMock
-from src.event_handler import EventHandler
+from nambaone.event_handler import EventHandler
 
 
 class TestEventHandler(unittest.TestCase):
