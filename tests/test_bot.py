@@ -1,7 +1,7 @@
 import mock
 import unittest
 from src.bot import Bot
-from unittest.mock import call, MagicMock
+from unittest.mock import MagicMock
 
 
 class TestBot(unittest.TestCase):

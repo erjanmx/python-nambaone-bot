@@ -1,3 +1,9 @@
+from . user import User
+from . chat import Chat
+from . update import Update
+from . message import Message
+
+
 class EventHandler:
     def __init__(self,
                  bot,
@@ -26,7 +32,7 @@ class EventHandler:
 
     @staticmethod
     def event_user_unfollow(request):
-        user = User(id=request['sender_id'])
+        user = User(id=request['id'])
 
         return Update(user)
 
@@ -38,8 +44,7 @@ class EventHandler:
 
         return Update(user, message, chat)
 
-    @staticmethod
-    def event_message_update(request):
+    def event_message_update(self, request):
         chat = Chat(id=request['chat_id'])
         user = User(id=request['sender_id'])
         message = Message(bot=self.bot, id=request['id'], type=request['type'], chat=chat,
