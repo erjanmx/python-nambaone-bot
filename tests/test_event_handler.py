@@ -1,10 +1,7 @@
 import mock
 import unittest
 from nambaone.bot import Bot
-from nambaone.user import User
-from nambaone.update import Update
 from unittest.mock import MagicMock
-from nambaone.event_handler import EventHandler
 
 
 class TestEventHandler(unittest.TestCase):
@@ -32,7 +29,6 @@ class TestEventHandler(unittest.TestCase):
         self.handler_mock.assert_called_once_with(self.bot, mock.ANY)
 
         self.assertEqual(self.bot.response, self.success_response)
-
 
     def test_run_user_unfollow(self):
         self.bot.handler.add('user_unfollow', self.handler_mock)
@@ -86,7 +82,6 @@ class TestEventHandler(unittest.TestCase):
         self.handler_mock.assert_called_once_with(self.bot, mock.ANY)
 
         self.assertEqual(self.bot.response, self.success_response)
-
 
     def test_run_message_update(self):
         self.bot.handler.add('message_update', self.handler_mock)

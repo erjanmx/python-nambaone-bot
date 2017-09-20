@@ -40,7 +40,7 @@ class EventHandler:
         chat = Chat(id=request['chat_id'])
         user = User(id=request['sender_id'])
         message = Message(bot=self.bot, id=request['id'], type=request['type'], chat=chat,
-                             status=request['status'], content=request['content'].strip())
+                          status=request['status'], content=request['content'].strip())
 
         return Update(user, message, chat)
 
@@ -48,7 +48,7 @@ class EventHandler:
         chat = Chat(id=request['chat_id'])
         user = User(id=request['sender_id'])
         message = Message(bot=self.bot, id=request['id'], type=request['type'], chat=chat,
-                             status=request['status'], content=request['content'].strip())
+                          status=request['status'], content=request['content'].strip())
 
         return Update(user, message)
 

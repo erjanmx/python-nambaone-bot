@@ -1,5 +1,4 @@
 import unittest
-from nambaone.user import User
 
 
 class TestUser(unittest.TestCase):

@@ -3,6 +3,7 @@ from . chat import Chat
 from . message import Message
 from . event_handler import EventHandler
 
+
 class Bot:
     _response = {
         'code': 200,
