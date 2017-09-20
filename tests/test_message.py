@@ -1,5 +1,5 @@
 import unittest
-from src.message import Message
+from nambaone.message import Message
 
 
 class TestMessage(unittest.TestCase):
