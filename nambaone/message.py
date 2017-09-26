@@ -14,6 +14,9 @@ class Message:
     def reply_typing(self):
         self.bot.typing_start(self.chat.id)
 
+    def reply_typing_stop(self):
+        self.bot.typing_stop(self.chat.id)
+
     def reply_text(self, content):
         self.bot.send_message(self.chat.id, content, 'text/plain')
 
