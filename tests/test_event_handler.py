@@ -103,6 +103,20 @@ class TestEventHandler(unittest.TestCase):
 
         self.assertEqual(self.bot.response, self.success_response)
 
+    def test_error(self):
+        self.bot.handler.add('message_new', self.handler_mock)
+        error_handler_mock = MagicMock()
+
+        self.bot.handler.add('error', error_handler_mock)
+
+        self.bot.run({
+            'event': 'message_new',
+        })
+
+        error_handler_mock.assert_called_once_with(self.bot, {'event': 'message_new', 'error': "KeyError('data',)"})
+        self.assertEqual(self.bot.response, {'code': 520, 'success': False})
+
 
 if __name__ == '__main__':
     unittest.main()
+

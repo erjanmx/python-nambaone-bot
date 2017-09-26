@@ -7,6 +7,7 @@ from . message import Message
 class EventHandler:
     def __init__(self,
                  bot,
+                 error_handler,
                  user_follow_handler,
                  user_unfollow_handler,
                  message_new_handler,
@@ -15,6 +16,7 @@ class EventHandler:
 
         self.bot = bot
 
+        self.error = error_handler
         self.user_follow = user_follow_handler
         self.user_unfollow = user_unfollow_handler
         self.message_new = message_new_handler
