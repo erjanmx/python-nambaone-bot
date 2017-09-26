@@ -5,14 +5,11 @@ from . event_handler import EventHandler
 
 
 class Bot:
-    _response = {
-        'code': 200,
-        'success': True,
-    }
 
     def __init__(self,
                  token,
                  base_url=None,
+                 error_handler=None,
                  user_follow_handler=None,
                  user_unfollow_handler=None,
                  message_new_handler=None,
@@ -25,12 +22,17 @@ class Bot:
 
         self.handler = EventHandler(
             self,
+            error_handler,
             user_follow_handler,
             user_unfollow_handler,
             message_new_handler,
             message_update_handler,
             chat_new_handler
         )
+        self._response = {
+            'code': 200,
+            'success': True,
+        }
 
     @property
     def response(self):
@@ -50,6 +52,7 @@ class Bot:
             update = getattr(self.handler, 'event_{}'.format(event))(request['data'])
             self.__call_handler(event, update)
         except Exception as e:
+            self.__call_handler('error', {'event': event, 'error': repr(e)})
             self._response['code'] = 520
 
     def __call_handler(self, event, update):
