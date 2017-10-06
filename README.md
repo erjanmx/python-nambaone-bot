@@ -1,8 +1,14 @@
-# Namba-One Bot
+# Python NambaOne Bot
 
 [![Build Status](https://travis-ci.org/erjanmx/python-nambaone-bot.svg?branch=master)](https://travis-ci.org/erjanmx/python-nambaone-bot)
 
-NambaOne BotAPI wrapper
+[NambaOne BotAPI](https://namba1.co/bot_creation) wrapper
+
+### Installing
+
+You can install or upgrade python-nambaone-bot with:
+
+```$ pip install nambaone --upgrade```
 
 ### Methods
 
