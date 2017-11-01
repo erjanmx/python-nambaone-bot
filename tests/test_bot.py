@@ -2,6 +2,7 @@ import mock
 import unittest
 from nambaone.bot import Bot
 from unittest.mock import MagicMock
+from nambaone.exceptions import ClientException
 
 
 class TestBot(unittest.TestCase):
@@ -17,84 +18,117 @@ class TestBot(unittest.TestCase):
 
         self.assertEqual(self.bot.header, expected_headers)
 
-    @mock.patch('nambaone.bot.requests.post')
-    def test_send_message(self, requests_post_mock):
+    @mock.patch.object(Bot, '_post')
+    def test_send_message(self, post_mock):
         chat_id = 1
         content = 'test_content'
         content_type = 'test_content_type'
 
-        requests_post_json_mock = MagicMock()
-        requests_post_json_mock.json.return_value = {
-            'data': {
-                'id': 1000,
-                'type': content_type,
-                'content': content,
-                'chat_id': chat_id,
-            },
-        }
+        self.bot.send_message(chat_id, content, content_type)
 
-        requests_post_mock.return_value = requests_post_json_mock
-
-        message = self.bot.send_message(chat_id, content, content_type)
-
-        requests_post_mock.assert_called_once_with(
+        post_mock.assert_called_once_with(
             'https://api.namba1.co/chats/1/write',
             {
                 'type': content_type,
                 'content': content,
-            },
-            headers=mock.ANY
+            }
         )
 
-        self.assertEqual(message.id, 1000)
-
-    @mock.patch('nambaone.bot.requests.post')
-    def test_create_chat(self, requests_post_mock):
+    @mock.patch.object(Bot, '_post')
+    def test_create_chat(self, post_mock):
         user_id = 1
         name = 'test_chat_name'
         image = 'test_chat_image'
 
-        requests_post_json_mock = MagicMock()
-        requests_post_json_mock.json.return_value = {
-            'data': {
-                'id': 1000,
-                'name': name,
-                'image': image,
-            },
-        }
-
-        requests_post_mock.return_value = requests_post_json_mock
-
         chat = self.bot.create_chat(user_id, name, image)
 
-        requests_post_mock.assert_called_once_with(
+        post_mock.assert_called_once_with(
             'https://api.namba1.co/chats/create',
             {
                 'name': name,
                 'image': image,
                 'members[]': user_id
-            },
-            headers=mock.ANY
+            }
         )
 
-        self.assertEqual(chat.id, 1000)
-
-    @mock.patch('nambaone.bot.requests.get')
-    def test_typing_start(self, requests_get_mock):
+    @mock.patch.object(Bot, '_get')
+    def test_typing_start(self, get_mock):
         self.bot.typing_start(1000)
 
-        requests_get_mock.assert_called_once_with(
-            'https://api.namba1.co/chats/1000/typing',
-            headers=mock.ANY
-        )
+        get_mock.assert_called_once_with('https://api.namba1.co/chats/1000/typing')
 
-    @mock.patch('nambaone.bot.requests.get')
-    def test_typing_stop(self, requests_get_mock):
+    @mock.patch.object(Bot, '_get')
+    def test_typing_stop(self, get_mock):
         self.bot.typing_stop(1000)
 
-        requests_get_mock.assert_called_once_with(
-            'https://api.namba1.co/chats/1000/stoptyping',
-            headers=mock.ANY
+        get_mock.assert_called_once_with('https://api.namba1.co/chats/1000/stoptyping')
+
+    @mock.patch('nambaone.bot.requests.get')
+    @mock.patch.object(Bot, '_parse_response')
+    def test__get(self, parse_response_mock, requests_get_mock):
+
+        self.bot._get('test_url')
+
+        requests_get_mock.assert_called_once_with('test_url', headers=mock.ANY, params=())
+
+    @mock.patch('nambaone.bot.requests.post')
+    @mock.patch.object(Bot, '_parse_response')
+    def test__post(self, parse_response_mock, requests_post_mock):
+        self.bot._post('test_url')
+
+        requests_post_mock.assert_called_once_with('test_url', headers=mock.ANY, data=())
+
+    def test__parse_response_success(self):
+        response = MagicMock()
+        response.json.return_value = {
+            'success': True
+        }
+
+        self.bot._parse_response(response)
+
+    def test__parse_response_empty(self):
+        method_to_test = self.bot._parse_response
+
+        self.assertRaisesRegex(
+            ClientException,
+            'No valid response returned',
+            method_to_test,
+            MagicMock()
+        )
+
+    def test__parse_response_error_with_message(self):
+        response = MagicMock()
+        response.url = 'test_url'
+
+        response.json.return_value = {
+            'success': False,
+            'message': 'test_error'
+        }
+
+        method_to_test = self.bot._parse_response
+
+        self.assertRaisesRegex(
+            ClientException,
+            'test_error in "test_url" request',
+            method_to_test,
+            response
+        )
+
+    def test__parse_response_error_without_message(self):
+        response = MagicMock()
+        response.url = 'test_url'
+
+        response.json.return_value = {
+            'success': False,
+        }
+
+        method_to_test = self.bot._parse_response
+
+        self.assertRaisesRegex(
+            ClientException,
+            'Unknown error in "test_url" request',
+            method_to_test,
+            response
         )
 
 

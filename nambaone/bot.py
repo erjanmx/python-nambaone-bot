@@ -1,6 +1,7 @@
 import requests
 from . chat import Chat
 from . message import Message
+from . exceptions import ClientException
 from . event_handler import EventHandler
 
 
@@ -59,6 +60,30 @@ class Bot:
         if hasattr(self.handler, event) and callable(getattr(self.handler, event)):
             getattr(self.handler, event)(self, update)
 
+    def _parse_response(self, response_raw):
+        response = response_raw.json()
+
+        if 'success' not in response:
+            raise ClientException('No valid response returned')
+
+        if not response['success']:
+            error_msg = 'Unknown error' if 'message' not in response else response['message']
+            error_msg += ' in "{}" request'.format(response_raw.url)
+
+            raise ClientException(error_msg)
+
+        return response
+
+    def _get(self, url, params=()):
+        return self._parse_response(
+            requests.get(url, params=params, headers=self.header)
+        )
+
+    def _post(self, url, params=()):
+        return self._parse_response(
+            requests.post(url, data=params, headers=self.header)
+        )
+
     def send_message(self, chat_id, content, content_type):
         params = {
             'type': content_type,
@@ -66,7 +91,7 @@ class Bot:
         }
         url = '{}/chats/{}/write'.format(self._base_url, chat_id)
 
-        response = requests.post(url, params, headers=self.header).json()
+        response = self._post(url, params)
 
         return Message.from_dict(response['data'])
 
@@ -78,16 +103,16 @@ class Bot:
         }
         url = '{}/chats/create'.format(self._base_url)
 
-        response = requests.post(url, params, headers=self.header).json()
+        response = self._post(url, params)
 
         return Chat.from_dict(response['data'])
 
     def typing_start(self, chat_id):
         url = '{}/chats/{}/typing'.format(self._base_url, chat_id)
 
-        return requests.get(url, headers=self.header)
+        return self._get(url)
 
     def typing_stop(self, chat_id):
         url = '{}/chats/{}/stoptyping'.format(self._base_url, chat_id)
 
-        return requests.get(url, headers=self.header)
+        return self._get(url)
