@@ -30,19 +30,19 @@ Bot(token,
 ```
 - Send message
 ```python
-Bot.send_message(chat_id, content, content_type) # according to api docs, returns Message object
+Bot.send_message(chat_id, content, content_type) # according to api docs, returns Message object or raises nambaone.ClientException
 ```
 - Create chat
 ```python
-Bot.create_chat(user_id, name='', image='')      # according to api docs, returns Chat object
+Bot.create_chat(user_id, name='', image='')      # according to api docs, returns Chat object or raises nambaone.ClientException
 ```
 - Start typing
 ```python
-Bot.typing_start(chat_id)                        # sends `typing` event to chat
+Bot.typing_start(chat_id)                        # sends `typing` event to chat or raises nambaone.ClientException
 ```
 - Stop typing
 ```python
-Bot.typing_stop(chat_id)                         # sends `stoptyping` event to chat
+Bot.typing_stop(chat_id)                         # sends `stoptyping` event to chat or raises nambaone.ClientException
 ```
 
 #### Message object contains bot field therefore there are handfull shortcuts such as
