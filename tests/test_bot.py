@@ -2,7 +2,7 @@ import mock
 import unittest
 from nambaone.bot import Bot
 from unittest.mock import MagicMock
-from nambaone.exceptions import ClientException
+from nambaone.exceptions import ClientException, FileNotFoundException
 
 
 class TestBot(unittest.TestCase):
@@ -129,6 +129,30 @@ class TestBot(unittest.TestCase):
             'Unknown error in "test_url" request',
             method_to_test,
             response
+        )
+
+    @mock.patch('nambaone.bot.requests.get')
+    def test_get_file(self, get_mock):
+        m = MagicMock()
+
+        m.content = 'file_content'
+        m.json.side_effect = ValueError
+        get_mock.return_value = m
+
+        response = self.bot.get_file('file_token')
+
+        get_mock.assert_called_once_with(
+            'https://files.namba1.co',
+            params={'token': 'file_token'}
+        )
+        self.assertEqual(response, 'file_content')
+
+    @mock.patch('nambaone.bot.requests.get')
+    def test_get_file_error(self, get_mock):
+        self.assertRaises(
+            ClientException,
+            self.bot.get_file,
+            'bad_token'
         )
 
 
