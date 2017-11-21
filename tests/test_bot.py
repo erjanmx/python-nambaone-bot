@@ -2,7 +2,7 @@ import mock
 import unittest
 from nambaone.bot import Bot
 from unittest.mock import patch, MagicMock
-from nambaone.exceptions import ClientException, FileNotFoundException, FileUploadException
+from nambaone.exceptions import ClientException, FileDownloadException, FileUploadException
 
 
 class TestBot(unittest.TestCase):
@@ -150,7 +150,7 @@ class TestBot(unittest.TestCase):
     @mock.patch('nambaone.bot.requests.get')
     def test_get_file_error(self, get_mock):
         self.assertRaises(
-            ClientException,
+            FileDownloadException,
             self.bot.get_file,
             'bad_token'
         )

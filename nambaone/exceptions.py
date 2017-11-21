@@ -4,7 +4,7 @@ class ClientException(Exception):
     pass
 
 
-class FileNotFoundException(ClientException):
+class FileDownloadException(ClientException):
     pass
 
 

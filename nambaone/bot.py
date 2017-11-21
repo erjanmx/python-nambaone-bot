@@ -3,7 +3,7 @@ from . chat import Chat
 from os.path import exists
 from . message import Message
 from . event_handler import EventHandler
-from . exceptions import ClientException, FileNotFoundException, FileUploadException
+from . exceptions import ClientException, FileDownloadException, FileUploadException
 
 
 class Bot:
@@ -130,7 +130,7 @@ class Bot:
             message = response.json()
             # if no errors occured and valid json returned
             # then file was not found
-            raise FileNotFoundException(message['message'])
+            raise FileDownloadException(message['message'])
         except ValueError:
             return response.content
 
