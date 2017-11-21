@@ -1,8 +1,8 @@
 import mock
 import unittest
 from nambaone.bot import Bot
-from unittest.mock import MagicMock
-from nambaone.exceptions import ClientException, FileNotFoundException
+from unittest.mock import patch, MagicMock
+from nambaone.exceptions import ClientException, FileNotFoundException, FileUploadException
 
 
 class TestBot(unittest.TestCase):
@@ -153,6 +153,51 @@ class TestBot(unittest.TestCase):
             ClientException,
             self.bot.get_file,
             'bad_token'
+        )
+
+    def test_send_file_no_file(self):
+        self.assertRaises(
+            FileUploadException,
+            self.bot.send_file,
+            'file_that_does_not_exist'
+        )
+
+    @mock.patch('nambaone.bot.open')
+    @mock.patch('nambaone.bot.exists')
+    @mock.patch('nambaone.bot.requests.post')
+    def test_send_file_error(self, post_mock, exists_mock, open_mock):
+        m = MagicMock()
+        m.json.return_value = {
+            'success': False
+        }
+        post_mock.return_value = m
+        exists_mock.return_value = True
+        open_mock.return_value = MagicMock()
+        self.assertRaisesRegex(
+            FileUploadException,
+            'Unknown error',
+            self.bot.send_file,
+            'file'
+        )
+
+    @mock.patch('nambaone.bot.open')
+    @mock.patch('nambaone.bot.exists')
+    @mock.patch('nambaone.bot.requests.post')
+    def test_send_file(self, post_mock, exists_mock, open_mock):
+        m = MagicMock()
+        m.json.return_value = {
+            'success': True,
+            'file': 'file_token'
+        }
+        post_mock.return_value = m
+        exists_mock.return_value = True
+        open_mock.return_value = MagicMock()
+
+        token = self.bot.send_file('file')
+        self.assertEqual(token, 'file_token')
+        post_mock.assert_called_once_with(
+            'https://files.namba1.co',
+            files={'file': mock.ANY}
         )
 
 

@@ -1,8 +1,9 @@
 import requests
 from . chat import Chat
+from os.path import exists
 from . message import Message
 from . event_handler import EventHandler
-from . exceptions import ClientException, FileNotFoundException
+from . exceptions import ClientException, FileNotFoundException, FileUploadException
 
 
 class Bot:
@@ -121,16 +122,32 @@ class Bot:
         return self._get(url)
 
     def get_file(self, token):
-        params = {
-            'token': token
-        }
+        """Use this method to download file by token"""
 
+        params = {'token': token}
         response = requests.get(self._base_file_url, params=params)
         try:
             message = response.json()
-
             # if no errors occured and valid json returned
             # then file was not found
             raise FileNotFoundException(message['message'])
         except ValueError:
             return response.content
+
+    def send_file(self, file_path):
+        """Use this method to upload file"""
+
+        if not exists(file_path):
+            raise FileUploadException('File does not exist')
+
+        response = None
+        with open(file_path, 'rb') as content:
+            files = {'file': content}
+            response = requests.post(self._base_file_url, files=files)
+
+        content = response.json()
+        if not content['success'] or 'file' not in content:
+            error_msg = content['message'] if 'message' in content else 'Unknown error'
+            raise FileUploadException(error_msg)
+
+        return content['file']
