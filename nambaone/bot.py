@@ -1,8 +1,8 @@
 import requests
 from . chat import Chat
 from . message import Message
-from . exceptions import ClientException
 from . event_handler import EventHandler
+from . exceptions import ClientException, FileNotFoundException
 
 
 class Bot:
@@ -10,6 +10,7 @@ class Bot:
     def __init__(self,
                  token,
                  base_url=None,
+                 base_file_url=None,
                  error_handler=None,
                  user_follow_handler=None,
                  user_unfollow_handler=None,
@@ -18,6 +19,8 @@ class Bot:
                  chat_new_handler=None):
 
         self._base_url = base_url or 'https://api.namba1.co'
+
+        self._base_file_url = base_file_url or 'https://files.namba1.co'
 
         self._token = token
 
@@ -116,3 +119,18 @@ class Bot:
         url = '{}/chats/{}/stoptyping'.format(self._base_url, chat_id)
 
         return self._get(url)
+
+    def get_file(self, token):
+        params = {
+            'token': token
+        }
+
+        response = requests.get(self._base_file_url, params=params)
+        try:
+            message = response.json()
+
+            # if no errors occured and valid json returned
+            # then file was not found
+            raise FileNotFoundException(message['message'])
+        except ValueError:
+            return response.content
